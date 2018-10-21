@@ -11,7 +11,7 @@ CREATE TABLE properties (
     description     TEXT,
     size            INT,
     raw_size         VARCHAR(50),
-    url             VARCHAR(2083) NOT NULL,
+    url             VARCHAR(2083) NOT NULL UNIQUE,
     build_type       VARCHAR(200),
     build_year       INT,
     date_created     TIMESTAMP NOT NULL DEFAULT now(),
