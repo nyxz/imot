@@ -17,7 +17,7 @@ public class ImotApplication {
 
     @Bean
     public DataSource dataSource() {
-        final String databaseUrl = Optional.ofNullable(System.getenv("DATABASE_URL"))
+        final String databaseUrl = Optional.ofNullable(System.getenv("JDBC_DATABASE_URL"))
                 .orElse("jdbc:postgresql://localhost:5432/imot");
         return DataSourceBuilder.create()
                 .url(databaseUrl)
