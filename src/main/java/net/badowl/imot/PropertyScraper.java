@@ -41,11 +41,6 @@ public class PropertyScraper {
     @Autowired
     private PropertyRepo repo;
 
-    @PostConstruct
-    public void setUp() throws Exception {
-        this.scrapeAll();
-    }
-
     @Transactional
     public void scrapeAll() throws Exception {
         LOG.info("Logging started...");
