@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,10 +60,13 @@ public class PropertyScraper {
                 "Изток",
                 "Изгрев",
                 "Кръстова вада",
+                "Лагера",
                 "Лозенец",
                 "Оборище",
                 "Сердика",
                 "Стрелбище",
+                "Хиподрума",
+                "Хладилника",
                 "Център",
                 "Яворов"
         );
@@ -98,7 +100,8 @@ public class PropertyScraper {
             allUrls.addAll(urls);
         }
         final List<Property> properties =
-                allUrls.stream().map(url -> this.toProperty(url, area)).collect(Collectors.toList());
+                allUrls.stream().map(url -> this.toProperty(url, area))
+                        .collect(Collectors.toList());
         repo.insert(properties);
     }
 
