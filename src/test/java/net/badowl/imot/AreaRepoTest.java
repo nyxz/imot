@@ -1,0 +1,27 @@
+package net.badowl.imot;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.batch.test.context.SpringBatchTest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+import static org.junit.Assert.*;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class AreaRepoTest {
+
+    @Autowired
+    private AreaRepo repo;
+
+    @Test
+    public void list() {
+        final List<String> list = repo.list();
+        assertTrue(list.size() > 0);
+    }
+}

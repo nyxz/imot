@@ -18,3 +18,7 @@ CREATE TABLE properties (
     date_modified    TIMESTAMP NOT NULL DEFAULT now()
 );
 
+
+CREATE TABLE areas (
+    name            VARCHAR(200) PRIMARY KEY
+);

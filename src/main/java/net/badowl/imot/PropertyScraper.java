@@ -12,7 +12,6 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,38 +37,17 @@ public class PropertyScraper {
                     "td:nth-of-type(2) > b";
 
     @Autowired
-    private PropertyRepo repo;
+    private PropertyRepo propertyRepo;
+
+    @Autowired
+    private AreaRepo areaRepo;
 
     @Transactional
     public void scrapeAll() throws Exception {
         LOG.info("Logging started...");
         final String initialUrl = "https://imoti-sofia.imot.bg/pcgi/imot" +
                 ".cgi?act=11&f1=1&f2=1&f3=3&f4=%E3%F0%E0%E4%20%D1%EE%F4%E8%FF&f5=";
-        final List<String> areas = Arrays.asList(
-                "Банишора",
-                "Белите брези",
-                "Борово",
-                "Гео Милев",
-                "Гоце Делчев",
-                "Дианабад",
-                "Докторски паметник",
-                "Зона Б-18",
-                "Зона Б-19",
-                "Зона Б-5",
-                "Зона Б-5-3",
-                "Изток",
-                "Изгрев",
-                "Кръстова вада",
-                "Лагера",
-                "Лозенец",
-                "Оборище",
-                "Сердика",
-                "Стрелбище",
-                "Хиподрума",
-                "Хладилника",
-                "Център",
-                "Яворов"
-        );
+        final List<String> areas = areaRepo.list();
         for (String area : areas) {
             LOG.info("Scraping area: " + area);
             scrape(area, initialUrl);
@@ -78,8 +56,7 @@ public class PropertyScraper {
         LOG.info("Scraping done.");
     }
 
-    @Transactional
-    public void scrape(String area, String initialUrl) throws IOException {
+    private void scrape(String area, String initialUrl) throws IOException {
         final Document document = Jsoup.connect(initialUrl).get();
         String areaHref = document.select("a:containsOwn(" + area + ")").attr("href");
         if (StringUtils.isEmpty(areaHref)) {
@@ -102,7 +79,7 @@ public class PropertyScraper {
         final List<Property> properties =
                 allUrls.stream().map(url -> this.toProperty(url, area))
                         .collect(Collectors.toList());
-        repo.insert(properties);
+        propertyRepo.insert(properties);
     }
 
     private int pagesCount(Document areaPage) {
