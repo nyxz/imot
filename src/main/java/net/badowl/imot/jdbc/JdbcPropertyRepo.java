@@ -29,8 +29,12 @@ public class JdbcPropertyRepo implements PropertyRepo {
                             "   raw_size, " +
                             "   url, " +
                             "   build_type, " +
-                            "   build_year) " +
-                            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+                            "   build_year," +
+                            "   raw_floor," +
+                            "   floor," +
+                            "   total_floors" +
+                            " ) " +
+                            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
                             " ON CONFLICT (url) DO UPDATE " +
                             "   SET date_modified = now() ",
                     property.getType(),

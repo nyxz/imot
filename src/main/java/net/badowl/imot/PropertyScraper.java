@@ -6,6 +6,7 @@ import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -35,6 +36,11 @@ public class PropertyScraper {
             "table[style*=\"margin-top:10px\"] > tbody > tr > " +
                     "td[height=\"235\"] > table:nth-of-type(2) > tbody > tr:nth-of-type(5) > " +
                     "td:nth-of-type(2) > b";
+    private static final String SELECTOR_FLOOR =
+            "table[style*=\"margin-top:10px\"] > tbody > tr > " +
+                    "td[height=\"235\"] > table:nth-of-type(2) > tbody > tr:nth-of-type(5) > " +
+                    "td:nth-of-type(2) > b";
+    ;
 
     @Autowired
     private PropertyRepo propertyRepo;
@@ -43,6 +49,7 @@ public class PropertyScraper {
     private AreaRepo areaRepo;
 
     @Transactional
+    @Async
     public void scrapeAll() throws Exception {
         LOG.info("Logging started...");
         final String initialUrl = "https://imoti-sofia.imot.bg/pcgi/imot" +
@@ -101,6 +108,7 @@ public class PropertyScraper {
         final String description = doc.select(SELECTOR_DESCRIPTION).text();
         final String size = doc.select(SELECTOR_SIZE).text();
         final String buildType = doc.select(SELECTOR_BUILD_TYPE).text();
+        final String floor = doc.select(SELECTOR_FLOOR).text();
 
         return Property.builder()
                 .url(url)
@@ -113,6 +121,9 @@ public class PropertyScraper {
                 .size(PropertyUtil.toSize(size))
                 .buildType(buildType)
                 .buildYear(PropertyUtil.toBuildYear(buildType, description))
+                .rawFloor(floor)
+                .floor(PropertyUtil.toFloor(floor))
+                .totalFloors(PropertyUtil.toTotalFloors(floor))
                 .build();
     }
 

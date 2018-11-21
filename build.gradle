@@ -36,6 +36,8 @@ dependencies {
 	implementation('org.springframework.boot:spring-boot-starter-webflux')
 	runtimeOnly('org.postgresql:postgresql')
 	compileOnly('org.projectlombok:lombok')
+	// https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
+	testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.3.1'
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
 	testImplementation('io.projectreactor:reactor-test')
 	testImplementation('org.springframework.batch:spring-batch-test')

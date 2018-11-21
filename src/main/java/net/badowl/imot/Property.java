@@ -24,6 +24,9 @@ public class Property {
     private String url;
     private String buildType;
     private Integer buildYear;
+    private String rawFloor;
+    private Integer floor;
+    private Integer totalFloors;
     private Date dateCreated;
     private Date dateModified;
 }

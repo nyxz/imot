@@ -10,6 +10,8 @@ public class PropertyUtil {
 
     private static final Pattern PATTERN_YEAR = Pattern.compile(".*(([12][0-9]{3})\\s?г\\s?).*");
     private static final String PATTERN_SIZE = "[^0-9]";
+    private static final Pattern PATTERN_FLOOR = Pattern.compile("^(\\d+).*$");
+    private static final Pattern PATTERN_TOTAL_FLOORS = Pattern.compile("^.+?(\\d+$)");
     private static final String CURRENCY = "EUR";
 
     public static Integer toBuildYear(String buildType, String description) {
@@ -26,15 +28,7 @@ public class PropertyUtil {
     }
 
     private static String yearFromText(String text) {
-        if (StringUtils.isEmpty(text)) {
-            return null;
-        }
-        final Matcher matcher = PATTERN_YEAR.matcher(text);
-        if (matcher.matches()) {
-            return matcher.group(2);
-        } else {
-            return null;
-        }
+        return parseWithRegex(text, PATTERN_YEAR, 2);
     }
 
 
@@ -53,5 +47,28 @@ public class PropertyUtil {
             int indexOfFirstCurrency = priceStr.trim().indexOf(CURRENCY);
             return Long.valueOf(priceStr.substring(0, indexOfFirstCurrency).replace(" ", ""));
         }
+    }
+
+    public static Integer toFloor(String floor) {
+        return Optional.ofNullable(parseWithRegex(floor, PATTERN_FLOOR, 1))
+                .map(Integer::parseInt)
+                .orElse(null);
+    }
+
+    public static Integer toTotalFloors(String floor) {
+        return Optional.ofNullable(parseWithRegex(floor, PATTERN_TOTAL_FLOORS, 1))
+                .map(Integer::parseInt)
+                .orElse(null);
+    }
+
+    private static String parseWithRegex(String text, Pattern pattern, int group) {
+        if (StringUtils.isEmpty(text)) {
+            return null;
+        }
+        final Matcher matcher = pattern.matcher(text);
+        if (matcher.matches()) {
+            return matcher.group(group);
+        }
+        return null;
     }
 }
