@@ -46,3 +46,6 @@ dependencies {
 	compile group: 'org.jsoup', name: 'jsoup', version: '1.11.3'
 
 }
+
+task stage(dependsOn: ['build', 'clean'])
+build.mustRunAfter clean
