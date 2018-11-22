@@ -13,6 +13,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,6 +63,7 @@ public class PropertyScraper {
         final String initialUrl = "https://imoti-sofia.imot.bg/pcgi/imot" +
                 ".cgi?act=11&f1=1&f2=1&f3=3&f4=%E3%F0%E0%E4%20%D1%EE%F4%E8%FF&f5=";
         final List<String> areas = areaRepo.list();
+        Collections.sort(areas);
         for (String area : areas) {
             LOG.info("Scraping area: " + area);
             scrape(area, initialUrl);
