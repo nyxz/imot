@@ -17,6 +17,8 @@ CREATE TABLE properties (
     raw_floor       VARCHAR,
     floor           INT,
     total_floors    INT,
+    seller_phone    VARCHAR(50),
+    seller_name     VARCHAR(256),
     date_created    TIMESTAMP NOT NULL DEFAULT now(),
     date_modified   TIMESTAMP NOT NULL DEFAULT now()
 );

@@ -32,9 +32,11 @@ public class JdbcPropertyRepo implements PropertyRepo {
                             "   build_year," +
                             "   raw_floor," +
                             "   floor," +
-                            "   total_floors" +
+                            "   total_floors, " +
+                            "   seller_phone, " +
+                            "   seller_name " +
                             " ) " +
-                            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+                            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
                             " ON CONFLICT (url) DO UPDATE " +
                             "   SET date_modified = now() ",
                     property.getType(),
@@ -47,7 +49,12 @@ public class JdbcPropertyRepo implements PropertyRepo {
                     property.getRawSize(),
                     property.getUrl(),
                     property.getBuildType(),
-                    property.getBuildYear());
+                    property.getBuildYear(),
+                    property.getRawFloor(),
+                    property.getFloor(),
+                    property.getTotalFloors(),
+                    property.getSellerPhone(),
+                    property.getSellerName());
         }
     }
 }

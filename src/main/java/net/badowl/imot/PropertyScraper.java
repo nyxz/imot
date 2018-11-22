@@ -38,9 +38,16 @@ public class PropertyScraper {
                     "td:nth-of-type(2) > b";
     private static final String SELECTOR_FLOOR =
             "table[style*=\"margin-top:10px\"] > tbody > tr > " +
-                    "td[height=\"235\"] > table:nth-of-type(2) > tbody > tr:nth-of-type(5) > " +
+                    "td[height=\"235\"] > table:nth-of-type(2) > tbody > tr:nth-of-type(2) > " +
                     "td:nth-of-type(2) > b";
-    ;
+    private static final String SELECTOR_SELLER_PHONE = "img[src='../images/picturess/phone" +
+            "-ico.gif'] + span:nth-of-type(1)";
+    private static final String SELECTOR_SELLER_NAME_1 =
+            "form[action='/pcgi/imot.cgi'] > table:nth-of-type(6) > tbody > tr > td:nth-of-type" +
+                    "(2) b";
+    private static final String SELECTOR_SELLER_NAME_2 =
+            "form[action='/pcgi/imot.cgi'] > table:nth-of-type(7) > tbody > tr > td:nth-of-type" +
+                    "(2) b";
 
     @Autowired
     private PropertyRepo propertyRepo;
@@ -109,6 +116,9 @@ public class PropertyScraper {
         final String size = doc.select(SELECTOR_SIZE).text();
         final String buildType = doc.select(SELECTOR_BUILD_TYPE).text();
         final String floor = doc.select(SELECTOR_FLOOR).text();
+        final String sellerPhone = doc.select(SELECTOR_SELLER_PHONE).text();
+        final String sellerName1 = doc.select(SELECTOR_SELLER_NAME_1).text();
+        final String sellerName2 = doc.select(SELECTOR_SELLER_NAME_2).text();
 
         return Property.builder()
                 .url(url)
@@ -124,6 +134,8 @@ public class PropertyScraper {
                 .rawFloor(floor)
                 .floor(PropertyUtil.toFloor(floor))
                 .totalFloors(PropertyUtil.toTotalFloors(floor))
+                .sellerPhone(sellerPhone)
+                .sellerName(firstOrSecond(sellerName1, sellerName2))
                 .build();
     }
 
@@ -133,6 +145,10 @@ public class PropertyScraper {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String firstOrSecond(final String value1, final String value2) {
+        return !StringUtils.isEmpty(value1) ? value1 : value2;
     }
 
     private String fromPartialUrl(String partialUrl) {
