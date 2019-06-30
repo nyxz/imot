@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 @Service
@@ -62,7 +64,7 @@ public class PropertyScraper {
 
     @Transactional
     @Async
-    public void scrapeAll() throws Exception {
+    public Future<Void> scrapeAll() throws Exception {
         LOG.info("Logging started...");
         final String initialUrl = "https://imoti-sofia.imot.bg/pcgi/imot" +
                 ".cgi?act=11&f1=1&f2=1&f3=3&f4=%E3%F0%E0%E4%20%D1%EE%F4%E8%FF&f5=";
@@ -74,6 +76,7 @@ public class PropertyScraper {
             Thread.sleep(3000);
         }
         LOG.info("Scraping done.");
+        return CompletableFuture.completedFuture(null);
     }
 
     private void scrape(String area, String initialUrl) throws IOException {
@@ -164,7 +167,12 @@ public class PropertyScraper {
     @Async
     @Transactional(readOnly = true)
     public void sendNotifications() throws IOException {
-        final List<PropertyEmailData> data = propertyRepo.findAllForNotification();
+        final List<PropertyEmailData> data = getAllToDisplay();
         emailSender.send(data);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PropertyEmailData> getAllToDisplay() {
+        return propertyRepo.findAllToDisplay();
     }
 }

@@ -5,6 +5,7 @@ import net.badowl.imot.PropertyEmailData;
 import net.badowl.imot.PropertyRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -65,7 +66,7 @@ public class JdbcPropertyRepo implements PropertyRepo {
     }
 
     @Override
-    public List<PropertyEmailData> findAllForNotification() {
-        return template.queryForList("SELECT * FROM properties WHERE " + filter, PropertyEmailData.class);
+    public List<PropertyEmailData> findAllToDisplay() {
+        return template.query("SELECT * FROM properties WHERE " + filter, new BeanPropertyRowMapper(PropertyEmailData.class));
     }
 }
