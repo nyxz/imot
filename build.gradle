@@ -36,6 +36,7 @@ dependencies {
 	implementation('org.springframework.boot:spring-boot-starter-webflux')
 	runtimeOnly('org.postgresql:postgresql')
 	compileOnly('org.projectlombok:lombok')
+	compile 'com.sendgrid:sendgrid-java:4.4.1'
 	// https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
 	testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.3.1'
 	testImplementation('org.springframework.boot:spring-boot-starter-test')

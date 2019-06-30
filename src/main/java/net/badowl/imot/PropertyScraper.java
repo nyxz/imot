@@ -1,5 +1,6 @@
 package net.badowl.imot;
 
+import net.badowl.imot.email.SendGridEmailSender;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -55,6 +56,9 @@ public class PropertyScraper {
 
     @Autowired
     private AreaRepo areaRepo;
+
+    @Autowired
+    private SendGridEmailSender emailSender;
 
     @Transactional
     @Async
@@ -155,5 +159,12 @@ public class PropertyScraper {
 
     private String fromPartialUrl(String partialUrl) {
         return "https:" + partialUrl;
+    }
+
+    @Async
+    @Transactional(readOnly = true)
+    public void sendNotifications() throws IOException {
+        final List<PropertyEmailData> data = propertyRepo.findAllForNotification();
+        emailSender.send(data);
     }
 }

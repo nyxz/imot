@@ -1,15 +1,21 @@
 package net.badowl.imot.jdbc;
 
 import net.badowl.imot.Property;
+import net.badowl.imot.PropertyEmailData;
 import net.badowl.imot.PropertyRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
+import java.util.List;
 
 @Repository
 public class JdbcPropertyRepo implements PropertyRepo {
+
+    @Value("${scraper.notification.sql.property.filter}")
+    private String filter;
 
     @Autowired
     private JdbcTemplate template;
@@ -56,5 +62,10 @@ public class JdbcPropertyRepo implements PropertyRepo {
                     property.getSellerPhone(),
                     property.getSellerName());
         }
+    }
+
+    @Override
+    public List<PropertyEmailData> findAllForNotification() {
+        return template.queryForList("SELECT * FROM properties WHERE " + filter, PropertyEmailData.class);
     }
 }
