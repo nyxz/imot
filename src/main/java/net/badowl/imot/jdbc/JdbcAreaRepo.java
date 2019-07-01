@@ -15,6 +15,6 @@ public class JdbcAreaRepo implements AreaRepo {
 
     @Override
     public List<String> list() {
-        return template.queryForList("SELECT * FROM areas WHERE enabled", String.class);
+        return template.queryForList("SELECT name FROM areas WHERE enabled", String.class);
     }
 }
