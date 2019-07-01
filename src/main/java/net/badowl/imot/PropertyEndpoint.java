@@ -19,6 +19,12 @@ public class PropertyEndpoint {
         scraper.scrapeAll();
     }
 
+    @PostMapping(path = "/scrape-notify")
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
+    public void scrapeAndNotify() throws Exception {
+        scraper.scrapeAndNotify();
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public void errorHandler(Exception ex) {

@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 @Service
@@ -62,9 +61,15 @@ public class PropertyScraper {
     @Autowired
     private SendGridEmailSender emailSender;
 
+    @Async
+    @Transactional
+    public CompletableFuture<Void> scrapeAndNotify() throws Exception {
+        return scrapeAll().thenCompose(x -> sendNotifications());
+    }
+
     @Transactional
     @Async
-    public Future<Void> scrapeAll() throws Exception {
+    public CompletableFuture<Void> scrapeAll() throws Exception {
         LOG.info("Logging started...");
         final String initialUrl = "https://imoti-sofia.imot.bg/pcgi/imot" +
                 ".cgi?act=11&f1=1&f2=1&f3=3&f4=%E3%F0%E0%E4%20%D1%EE%F4%E8%FF&f5=";
@@ -166,9 +171,14 @@ public class PropertyScraper {
 
     @Async
     @Transactional(readOnly = true)
-    public void sendNotifications() throws IOException {
-        final List<PropertyEmailData> data = getAllToDisplay();
-        emailSender.send(data);
+    public CompletableFuture<Void> sendNotifications() {
+        try {
+            final List<PropertyEmailData> data = getAllToDisplay();
+            emailSender.send(data);
+            return CompletableFuture.completedFuture(null);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Transactional(readOnly = true)
