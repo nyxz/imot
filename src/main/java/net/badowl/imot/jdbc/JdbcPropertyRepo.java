@@ -67,6 +67,9 @@ public class JdbcPropertyRepo implements PropertyRepo {
 
     @Override
     public List<PropertyEmailData> findAllToDisplay() {
-        return template.query("SELECT * FROM properties WHERE " + filter, new BeanPropertyRowMapper(PropertyEmailData.class));
+        final String sql = "SELECT * FROM properties WHERE "
+                + filter
+                + " ORDER BY area ";
+        return template.query(sql, new BeanPropertyRowMapper<>(PropertyEmailData.class));
     }
 }
