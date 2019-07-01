@@ -22,6 +22,7 @@
                         <th>Address</th>
                         <th>Price</th>
                         <th>Size</th>
+                        <th>Year</th>
                         <th>Floor</th>
                         <th></th>
                     </tr>
@@ -32,6 +33,7 @@
                         <td th:text="${property.address}"></td>
                         <td><span th:text="${property.price}"></span> EUR</td>
                         <td><span th:text="${property.size}"></span> m<sup>2</sup></td>
+                        <td th:text="${property.buildYear}"></td>
                         <td><span th:text="${property.floor}"></span> / <span th:text="${property.totalFloors}"></span></td>
                         <td><a th:href="${property.url}" class="btn btn-primary">View</a></td>
                     </tr>
