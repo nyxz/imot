@@ -174,7 +174,8 @@ public class PropertyScraper {
     public CompletableFuture<Void> sendNotifications() {
         try {
             final List<PropertyEmailData> data = getAllToDisplay();
-            emailSender.send(data);
+            Collections.shuffle(data);
+            emailSender.send(data.stream().limit(10).collect(Collectors.toList()));
             return CompletableFuture.completedFuture(null);
         } catch (IOException e) {
             throw new RuntimeException(e);

@@ -1,6 +1,5 @@
 package net.badowl.imot.email;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sendgrid.Method;
 import com.sendgrid.Request;
 import com.sendgrid.Response;
@@ -9,7 +8,6 @@ import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Email;
 import com.sendgrid.helpers.mail.objects.Personalization;
 import net.badowl.imot.PropertyEmailData;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +17,6 @@ import java.util.List;
 
 @Service
 public class SendGridEmailSender {
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
     @Value("${sendgrid.apiKey}")
     private String sendgridApiKey;
 
@@ -38,7 +32,7 @@ public class SendGridEmailSender {
     public void send(final List<PropertyEmailData> templateData) throws IOException {
         try {
             final Personalization personalization = new Personalization();
-            personalization.addDynamicTemplateData("properties", objectMapper.writeValueAsString(templateData));
+            personalization.addDynamicTemplateData("properties", templateData);
             Arrays.stream(emailReceivers.split(",")).map(Email::new).forEach(personalization::addTo);
 
             final Mail mail = new Mail();
