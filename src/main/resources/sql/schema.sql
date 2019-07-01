@@ -25,5 +25,6 @@ CREATE TABLE properties (
 
 
 CREATE TABLE areas (
-    name            VARCHAR(200) PRIMARY KEY
+    name            VARCHAR(200)    PRIMARY KEY,
+    enabled         BOOLEAN         NOT NULL DEFAULT TRUE
 );
