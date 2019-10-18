@@ -1,6 +1,6 @@
 package net.badowl.imot;
 
-import net.badowl.imot.email.SendGridEmailSender;
+import org.apache.tomcat.jni.Thread;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -12,45 +12,30 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
+import net.badowl.imot.email.SendGridEmailSender;
 
 @Service
 public class PropertyScraper {
     private final static Logger LOG = LoggerFactory.getLogger(PropertyScraper.class);
 
-    private static final String SELECTOR_TYPE =
-            "table[style*=\"margin-top:10px\"] > tbody > tr > " +
-                    "td[height=\"235\"] > span:nth-of-type(1)";
-    private static final String SELECTOR_NEIGHBOURHOOD =
-            "table[style*=\"margin-top:10px\"] > tbody > tr > td[height=\"235\"] > " +
-                    "span:nth-of-type(2)";
+    private static final String SELECTOR_TYPE = "table[style*=\"margin-top:10px\"] > tbody > tr > "
+            + "td[height=\"235\"] > span:nth-of-type(1)";
+    private static final String SELECTOR_NEIGHBOURHOOD = "table[style*=\"margin-top:10px\"] > tbody > tr > td[height=\"235\"] > "
+            + "span:nth-of-type(2)";
     private static final String SELECTOR_PRICE = "span#cena";
     private static final String SELECTOR_DESCRIPTION = "div#description_div";
-    private static final String SELECTOR_SIZE =
-            "table[style*=\"margin-top:10px\"] > tbody > tr > " +
-                    "td[height=\"235\"] > table:nth-of-type(2) > tbody > tr:nth-of-type(1) > " +
-                    "td:nth-of-type(2) > b";
-    private static final String SELECTOR_BUILD_TYPE =
-            "table[style*=\"margin-top:10px\"] > tbody > tr > " +
-                    "td[height=\"235\"] > table:nth-of-type(2) > tbody > tr:nth-of-type(5) > " +
-                    "td:nth-of-type(2) > b";
-    private static final String SELECTOR_FLOOR =
-            "table[style*=\"margin-top:10px\"] > tbody > tr > " +
-                    "td[height=\"235\"] > table:nth-of-type(2) > tbody > tr:nth-of-type(2) > " +
-                    "td:nth-of-type(2) > b";
-    private static final String SELECTOR_SELLER_PHONE = "img[src='../images/picturess/phone" +
-            "-ico.gif'] + span:nth-of-type(1)";
-    private static final String SELECTOR_SELLER_NAME_1 =
-            "form[action='/pcgi/imot.cgi'] > table:nth-of-type(6) > tbody > tr > td:nth-of-type" +
-                    "(2) b";
-    private static final String SELECTOR_SELLER_NAME_2 =
-            "form[action='/pcgi/imot.cgi'] > table:nth-of-type(7) > tbody > tr > td:nth-of-type" +
-                    "(2) b";
+    private static final String SELECTOR_SIZE = "table[style*=\"margin-top:10px\"] > tbody > tr > "
+            + "td[height=\"235\"] > table:nth-of-type(2) > tbody > tr:nth-of-type(1) > " + "td:nth-of-type(2) > b";
+    private static final String SELECTOR_BUILD_TYPE = "table[style*=\"margin-top:10px\"] > tbody > tr > "
+            + "td[height=\"235\"] > table:nth-of-type(2) > tbody > tr:nth-of-type(5) > " + "td:nth-of-type(2) > b";
+    private static final String SELECTOR_FLOOR = "table[style*=\"margin-top:10px\"] > tbody > tr > "
+            + "td[height=\"235\"] > table:nth-of-type(2) > tbody > tr:nth-of-type(2) > " + "td:nth-of-type(2) > b";
+    private static final String SELECTOR_SELLER_PHONE = "img[src='../images/picturess/phone"
+            + "-ico.gif'] + span:nth-of-type(1)";
+    private static final String SELECTOR_SELLER_NAME_1 = "form[action='/pcgi/imot.cgi'] > table:nth-of-type(6) > tbody > tr > td:nth-of-type"
+            + "(2) b";
+    private static final String SELECTOR_SELLER_NAME_2 = "form[action='/pcgi/imot.cgi'] > table:nth-of-type(7) > tbody > tr > td:nth-of-type"
+            + "(2) b";
 
     @Autowired
     private PropertyRepo propertyRepo;
@@ -71,8 +56,8 @@ public class PropertyScraper {
     @Async
     public CompletableFuture<Void> scrapeAll() throws Exception {
         LOG.info("Logging started...");
-        final String initialUrl = "https://imoti-sofia.imot.bg/pcgi/imot" +
-                ".cgi?act=11&f1=1&f2=1&f3=3&f4=%E3%F0%E0%E4%20%D1%EE%F4%E8%FF&f5=";
+        final String initialUrl = "https://imoti-sofia.imot.bg/pcgi/imot"
+                + ".cgi?act=11&f1=1&f2=1&f3=3&f4=%E3%F0%E0%E4%20%D1%EE%F4%E8%FF&f5=";
         final List<String> areas = areaRepo.list();
         Collections.sort(areas);
         for (String area : areas) {
@@ -98,15 +83,12 @@ public class PropertyScraper {
         for (int currPage = 0; currPage < pagesNum; currPage++) {
             final String numberedAreaPageHref = fullAreaHref + "&f6=" + (currPage + 1);
             final Document numberedAreaPage = Jsoup.connect(numberedAreaPageHref).get();
-            final List<String> urls = numberedAreaPage.select("a.lnk2")
-                    .stream()
-                    .map(link -> fromPartialUrl(link.attr("href")))
-                    .collect(Collectors.toList());
+            final List<String> urls = numberedAreaPage.select("a.lnk2").stream()
+                    .map(link -> fromPartialUrl(link.attr("href"))).collect(Collectors.toList());
             allUrls.addAll(urls);
         }
-        final List<Property> properties =
-                allUrls.stream().map(url -> this.toProperty(url, area))
-                        .collect(Collectors.toList());
+        final List<Property> properties = allUrls.stream().map(url -> this.toProperty(url, area))
+                .collect(Collectors.toList());
         propertyRepo.insert(properties);
     }
 
@@ -134,23 +116,11 @@ public class PropertyScraper {
         final String sellerName1 = doc.select(SELECTOR_SELLER_NAME_1).text();
         final String sellerName2 = doc.select(SELECTOR_SELLER_NAME_2).text();
 
-        return Property.builder()
-                .url(url)
-                .type(type)
-                .area(area)
-                .address(neighbourhood)
-                .rawPrice(price)
-                .price(PropertyUtil.toPrice(price))
-                .description(description)
-                .size(PropertyUtil.toSize(size))
-                .buildType(buildType)
-                .buildYear(PropertyUtil.toBuildYear(buildType, description))
-                .rawFloor(floor)
-                .floor(PropertyUtil.toFloor(floor))
-                .totalFloors(PropertyUtil.toTotalFloors(floor))
-                .sellerPhone(sellerPhone)
-                .sellerName(firstOrSecond(sellerName1, sellerName2))
-                .build();
+        return Property.builder().url(url).type(type).area(area).address(neighbourhood).rawPrice(price)
+                .price(PropertyUtil.toPrice(price)).description(description).size(PropertyUtil.toSize(size))
+                .buildType(buildType).buildYear(PropertyUtil.toBuildYear(buildType, description)).rawFloor(floor)
+                .floor(PropertyUtil.toFloor(floor)).totalFloors(PropertyUtil.toTotalFloors(floor))
+                .sellerPhone(sellerPhone).sellerName(firstOrSecond(sellerName1, sellerName2)).build();
     }
 
     private Document getDocSafe(Connection connection) {
@@ -173,9 +143,7 @@ public class PropertyScraper {
     @Transactional(readOnly = true)
     public CompletableFuture<Void> sendNotifications() {
         try {
-            final List<PropertyEmailData> data = getAllToDisplay();
-            Collections.shuffle(data);
-            emailSender.send(data.stream().limit(10).collect(Collectors.toList()));
+            emailSender.send(getAllToDisplay());
             return CompletableFuture.completedFuture(null);
         } catch (IOException e) {
             throw new RuntimeException(e);
