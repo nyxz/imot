@@ -137,6 +137,7 @@ public class PropertyScraper {
                 .totalFloors(PropertyUtil.toTotalFloors(floor))
                 .sellerPhone(sellerPhone)
                 .sellerName(firstOrSecond(sellerName1, sellerName2))
+                .providerWebsite("imot.bg")
                 .build();
     }
 

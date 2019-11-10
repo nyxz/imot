@@ -41,27 +41,31 @@ public class JdbcPropertyRepo implements PropertyRepo {
                             "   floor," +
                             "   total_floors, " +
                             "   seller_phone, " +
-                            "   seller_name " +
+                            "   seller_name, " +
+                            "   provider_website " +
                             " ) " +
-                            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+                            " VALUES ( " +
+                            "   :type, " +
+                            "   :area, " +
+                            "   :address, " +
+                            "   :price, " +
+                            "   :rawPrice, " +
+                            "   :description, " +
+                            "   :size, " +
+                            "   :rawSize, " +
+                            "   :url, " +
+                            "   :buildType, " +
+                            "   :buildYear," +
+                            "   :rawFloor," +
+                            "   :floor," +
+                            "   :totalFloors, " +
+                            "   :sellerPhone, " +
+                            "   :sellerName, " +
+                            "   :providerWebsite " +
+                            " ) " +
                             " ON CONFLICT (url) DO UPDATE " +
                             "   SET date_modified = now() ",
-                    property.getType(),
-                    property.getArea(),
-                    property.getAddress(),
-                    property.getPrice(),
-                    property.getRawPrice(),
-                    property.getDescription(),
-                    property.getSize(),
-                    property.getRawSize(),
-                    property.getUrl(),
-                    property.getBuildType(),
-                    property.getBuildYear(),
-                    property.getRawFloor(),
-                    property.getFloor(),
-                    property.getTotalFloors(),
-                    property.getSellerPhone(),
-                    property.getSellerName());
+                    new BeanPropertyRowMapper<>(Property.class), property);
         }
     }
 

@@ -29,6 +29,7 @@ public class Property {
     private Integer totalFloors;
     private String sellerPhone;
     private String sellerName;
+    private String providerWebsite;
     private Date dateCreated;
     private Date dateModified;
 }
