@@ -6,7 +6,8 @@ import net.badowl.imot.PropertyRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
@@ -19,7 +20,7 @@ public class JdbcPropertyRepo implements PropertyRepo {
     private String filter;
 
     @Autowired
-    private JdbcTemplate template;
+    private NamedParameterJdbcTemplate template;
 
     @Override
     public void insert(Collection<Property> properties) {
@@ -64,8 +65,7 @@ public class JdbcPropertyRepo implements PropertyRepo {
                             "   :providerWebsite " +
                             " ) " +
                             " ON CONFLICT (url) DO UPDATE " +
-                            "   SET date_modified = now() ",
-                    new BeanPropertyRowMapper<>(Property.class), property);
+                            "   SET date_modified = now() ", new BeanPropertySqlParameterSource(property));
         }
     }
 
