@@ -11,6 +11,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -86,7 +87,12 @@ public class PropertyScraper {
 
         final List<String> allUrls = new ArrayList<>();
         for (int currPage = 0; currPage < pagesNum; currPage++) {
-            final String numberedAreaPageHref = fullAreaHref + "&f6=" + (currPage + 1);
+            final String numberedAreaPageHref =
+                    UriComponentsBuilder.fromUriString(fullAreaHref)
+                            .queryParam("f6", (currPage + 1))
+                            .build()
+                            .toUri()
+                            .toString();
             final Document numberedAreaPage = Jsoup.connect(numberedAreaPageHref).get();
             final List<String> urls = numberedAreaPage.select("a.lnk2").stream()
                     .map(link -> fromPartialUrl(link.attr("href"))).collect(Collectors.toList());
