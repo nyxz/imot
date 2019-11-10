@@ -45,6 +45,10 @@ public class PropertyUtil {
             return null;
         } else {
             int indexOfFirstCurrency = priceStr.trim().indexOf(CURRENCY);
+            if (indexOfFirstCurrency < 0) {
+                // probably the currency is wrong
+                return null;
+            }
             return Long.valueOf(priceStr.substring(0, indexOfFirstCurrency).replace(" ", ""));
         }
     }
