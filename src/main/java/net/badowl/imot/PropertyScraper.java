@@ -121,7 +121,7 @@ public class PropertyScraper {
         final String sellerName1 = doc.select(SELECTOR_SELLER_NAME_1).text();
         final String sellerName2 = doc.select(SELECTOR_SELLER_NAME_2).text();
 
-       return Property.builder()
+        return Property.builder()
                 .url(url)
                 .type(type)
                 .area(area)
