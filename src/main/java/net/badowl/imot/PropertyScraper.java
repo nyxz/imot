@@ -24,24 +24,20 @@ import java.util.stream.Collectors;
 public class PropertyScraper {
     private final static Logger LOG = LoggerFactory.getLogger(PropertyScraper.class);
 
-    private static final String SELECTOR_TYPE = "table[style*=\"margin-top:10px\"] > tbody > tr > " +
-            "td[height=\"235\"] > span:nth-of-type(1)";
-    private static final String SELECTOR_NEIGHBOURHOOD = "table[style*=\"margin-top:10px\"] > tbody > tr > td[height=\"235\"] > " +
-            "span:nth-of-type(2)";
+    private static final String SELECTOR_DETAILS_WRAPPER = "form[name=search] > table.newAdImages + div ";
+    private static final String SELECTOR_TYPE = SELECTOR_DETAILS_WRAPPER + "> strong:containsOwn(Продава)";
+    private static final String SELECTOR_NEIGHBOURHOOD = SELECTOR_DETAILS_WRAPPER + "> span";
     private static final String SELECTOR_PRICE = "span#cena";
     private static final String SELECTOR_DESCRIPTION = "div#description_div";
-    private static final String SELECTOR_SIZE = "table[style*=\"margin-top:10px\"] > tbody > tr > " +
-            "td[height=\"235\"] > table:nth-of-type(2) > tbody > tr:nth-of-type(1) > " + "td:nth-of-type(2) > b";
-    private static final String SELECTOR_BUILD_TYPE = "table[style*=\"margin-top:10px\"] > tbody > tr > " +
-            "td[height=\"235\"] > table:nth-of-type(2) > tbody > tr:nth-of-type(5) > " + "td:nth-of-type(2) > b";
-    private static final String SELECTOR_FLOOR = "table[style*=\"margin-top:10px\"] > tbody > tr > " +
-            "td[height=\"235\"] > table:nth-of-type(2) > tbody > tr:nth-of-type(2) > " + "td:nth-of-type(2) > b";
-    private static final String SELECTOR_SELLER_PHONE = "img[src='../images/picturess/phone" +
-            "-ico.gif'] + span:nth-of-type(1)";
-    private static final String SELECTOR_SELLER_NAME_1 = "form[action='/pcgi/imot.cgi'] > table:nth-of-type(6) > tbody > tr > td:nth-of-type" +
-            "(2) b";
-    private static final String SELECTOR_SELLER_NAME_2 = "form[action='/pcgi/imot.cgi'] > table:nth-of-type(7) > tbody > tr > td:nth-of-type" +
-            "(2) b";
+    private static final String SELECTOR_SIZE =
+            SELECTOR_DETAILS_WRAPPER + "> ul.imotData > li:containsOwn(Квадратура) + li";
+    private static final String SELECTOR_FLOOR =
+            SELECTOR_DETAILS_WRAPPER + "> ul.imotData > li:containsOwn(Етаж) + li";
+    private static final String SELECTOR_BUILD_TYPE =
+            SELECTOR_DETAILS_WRAPPER + "> ul.imotData > li:containsOwn(Строителство) + li";
+    private static final String SELECTOR_SELLER_PHONE =
+            "img[src='../images/picturess/phone-ico.gif'] + span:nth-of-type(1)";
+    private static final String SELECTOR_SELLER_NAME = "div[style='float:left; margin-right:20px'] > b";
 
     @Autowired
     private PropertyRepo propertyRepo;
@@ -62,8 +58,8 @@ public class PropertyScraper {
     @Async
     public CompletableFuture<Void> scrapeAll() throws Exception {
         LOG.info("Logging started...");
-        final String initialUrl = "https://imoti-sofia.imot.bg/pcgi/imot" +
-                ".cgi?act=11&f1=1&f2=1&f3=3&f4=%E3%F0%E0%E4%20%D1%EE%F4%E8%FF&f5=";
+        final String initialUrl =
+                "https://imoti-sofia.imot.bg/pcgi/imot.cgi?act=11&f1=1&f2=1&f3=3&f4=%E3%F0%E0%E4%20%D1%EE%F4%E8%FF&f5=";
         final List<String> areas = areaRepo.list();
         Collections.sort(areas);
         for (String area : areas) {
@@ -77,7 +73,7 @@ public class PropertyScraper {
 
     private void scrape(String area, String initialUrl) throws IOException {
         final Document document = Jsoup.connect(initialUrl).get();
-        String areaHref = document.select("a:containsOwn(" + area + ")").attr("href");
+        String areaHref = document.select("a.qLinks12:containsOwn(" + area + ")").attr("href");
         if (StringUtils.isEmpty(areaHref)) {
             return;
         }
@@ -116,16 +112,15 @@ public class PropertyScraper {
 
     private Property toProperty(String url, String area) {
         final Document doc = getDocSafe(Jsoup.connect(url));
-        final String type = doc.select(SELECTOR_TYPE).text();
-        final String neighbourhood = doc.select(SELECTOR_NEIGHBOURHOOD).text();
+        final String type = doc.select(SELECTOR_TYPE).text().replace("Продава ", "");
+        final String neighbourhood = doc.select(SELECTOR_NEIGHBOURHOOD).get(0).text();
         final String price = doc.select(SELECTOR_PRICE).text();
         final String description = doc.select(SELECTOR_DESCRIPTION).text();
         final String size = doc.select(SELECTOR_SIZE).text();
         final String buildType = doc.select(SELECTOR_BUILD_TYPE).text();
         final String floor = doc.select(SELECTOR_FLOOR).text();
         final String sellerPhone = doc.select(SELECTOR_SELLER_PHONE).text();
-        final String sellerName1 = doc.select(SELECTOR_SELLER_NAME_1).text();
-        final String sellerName2 = doc.select(SELECTOR_SELLER_NAME_2).text();
+        final String sellerName = doc.select(SELECTOR_SELLER_NAME).text();
 
         return Property.builder()
                 .url(url)
@@ -142,7 +137,7 @@ public class PropertyScraper {
                 .floor(PropertyUtil.toFloor(floor))
                 .totalFloors(PropertyUtil.toTotalFloors(floor))
                 .sellerPhone(sellerPhone)
-                .sellerName(firstOrSecond(sellerName1, sellerName2))
+                .sellerName(sellerName)
                 .providerWebsite("imot.bg")
                 .build();
     }
@@ -153,10 +148,6 @@ public class PropertyScraper {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private String firstOrSecond(final String value1, final String value2) {
-        return !StringUtils.isEmpty(value1) ? value1 : value2;
     }
 
     private String fromPartialUrl(String partialUrl) {
