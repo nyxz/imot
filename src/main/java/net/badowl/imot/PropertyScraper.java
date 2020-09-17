@@ -73,7 +73,7 @@ public class PropertyScraper {
 
     private void scrape(String area, String initialUrl) throws IOException {
         final Document document = Jsoup.connect(initialUrl).get();
-        String areaHref = document.select("a.qLinks12:containsOwn(" + area + ")").attr("href");
+        String areaHref = document.select("a.qLinks12:matchesOwn(" + area + ")").attr("href");
         if (StringUtils.isEmpty(areaHref)) {
             return;
         }
